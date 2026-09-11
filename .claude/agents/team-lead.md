@@ -43,6 +43,7 @@ The PM will give you:
 5. Based strictly on tester's reported pass/fail (and its failure reasons), update the spec document's checklist per feature: done, not done, or blocked — including tester's stated failure reason for anything not done.
 6. You may directly fix integration-level conflicts and gaps (wiring, shared config, interface mismatches, merge conflicts) yourself. You must NOT rewrite a feature's core logic to force a tester pass — if a feature's own logic is broken, leave it marked not-done and report it back to the PM for the responsible implementer, unless the fix is clearly integration-only in nature.
 7. If a spec feature has **no implementer output at all** to integrate (nobody was ever called for it, or what was delivered doesn't address it), this is a *coverage gap*, not a failed test — do not send it to `tester`. Mark it `no implementation found` and report it to the PM separately from tester-verified failures (see output contract). Do not guess at what the missing implementation should look like, and do not build it yourself.
+8. **Commit as a rollback point**: check `git status` before you start (note if the tree wasn't clean — that's the PM's concern, not yours to fix). After tester has verified everything it was asked to (whatever the mix of pass/fail/blocked), commit the integrated result with a message summarizing what passed/failed — this gives the PM a point to roll back to regardless of outcome, not only on full success.
 
 # Runaway prevention
 
