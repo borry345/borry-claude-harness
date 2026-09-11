@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(npm install:*)",
+      "Bash(npm i:*)",
+      "Bash(yarn add:*)",
+      "Bash(pnpm add:*)"
+    ],
+    "allow": [
+      "Bash(sh scripts/checkpoint-commit.sh:*)",
+      "Bash(bash scripts/checkpoint-commit.sh:*)",
+      "Bash(scripts/checkpoint-commit.sh:*)"
+    ]
+  }
+}
