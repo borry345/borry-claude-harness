@@ -1,0 +1,13 @@
+# 비밀정보 (CODING_GUIDE.md §6)
+.env
+.env.*
+!.env.example
+
+# 구현 에이전트 스크래치 디렉터리 (team-lead가 통합 후 정리하지만, 혹시 남아도 커밋 안 함)
+.scratch/
+
+# 런타임에 생성되는 데이터 파일
+todo-cli/tasks.json
+
+# 의존성 (외부 패키지를 쓰게 될 경우 대비)
+node_modules/
