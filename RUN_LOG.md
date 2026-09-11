@@ -37,3 +37,7 @@ PM과 team-lead가 에이전트를 호출할 때마다 한 줄씩 여기에 appe
 [2026-09-11 17:10] tester → team-lead (대상: F202/F203, 시도 1회차 결과) — PASS (기존 6건 독립 재실행 + 신규 10건 직접 작성/실행, 16/16 Node로 직접 확인, implementer-C 자기보고 신뢰하지 않고 독립 재검증. -0 미필터링 경계 관찰 1건 기록)
 [2026-09-11 17:10] tester → team-lead (대상: F204/F205/F206/F207, 시도 1회차 결과) — 4개 전부 PASS (순수 로직 30건 + 정적 구조 검증 17건, Node 직접 실행 47건 전부 통과. onSnapshot 실시간성/실제 렌더링 라이브 미검증 명시)
 [2026-09-11] team-lead: 4개 그룹 전부 1회차 PASS, 재호출(3-strikes) 불필요. SPEC_LOG_PJT.md §7 구현 현황 섹션 신설·기록 완료.
+[2026-09-11] team-lead → PM (결과) — checkpoint 커밋(632f5d5)이 실제로는 SPEC/RUN_LOG 문서만 커버함을 보고. pjt2/1649641-pjt2가 ppjt2 git 바깥(형제 폴더)이라 실제 앱 코드는 무방비 상태였음을 발견·보고.
+[2026-09-11] PM — pjt2/1649641-pjt2에 신규 git repo init + 커밋(ac513b9) — 사용자 승인 받고 진행, 안전망 확보.
+[2026-09-11] PM — pjt2/1649641 Setting 버튼 커밋(c44bcd5), 원격을 신규 PJT2 저장소(lab.ssafy.com/s16/a20/20260911-pjt-2/1649641.git)로 교체, 템플릿 README와 병합(2957b01) 후 push — 사용자 지시 및 승인.
+[2026-09-11] PM — firebase deploy --only functions:processRawLogs --project pjt2-c3b41 실행 성공(Node 20 런타임으로 상향, helloWorld는 미변경) — 사용자 승인. pjt2/1649641-pjt2에 커밋(30599b2).
