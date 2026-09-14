@@ -1,43 +1,28 @@
-# 실행 로그 (Dispatch Log)
+# 실행 로그 (하네스 자체 전용)
 
-PM과 team-lead가 에이전트를 호출할 때마다 한 줄씩 여기에 append한다. 대화 컨텍스트가 요약되어도
-"같은 대상을 몇 번째 부르는 중인지"를 파일 기준으로 기계적으로 확인하기 위한 용도다.
+**범위(2026-09-14 정리, 이후 "에이전트만을 위한 범용 하네스" 원칙으로 확정)**: 이 파일은
+**하네스 자체의 변경**만 기록한다 — 에이전트 신설/수정(`.claude/agents/*.md`), 정책·규칙 변경
+(`ORCHESTRATION.md`/`CODING_GUIDE.md` 개정) 등. 특정 프로젝트의 기능 구현을 위한 에이전트
+디스패치(구현/통합/테스트)는 여기 적지 않는다 — 그건 **이 하네스 폴더 바깥에 있는, 그 프로젝트
+자신의 `RUN_LOG.md`**에 적는다. 판단 기준과 세부 규칙은 `ORCHESTRATION.md`의 "RUN_LOG.md 범위
+규칙" 참고.
+
+이전에는 이 파일에 프로젝트별 로그가 섞여 있었고(todo-cli, 로그 데이터 관리 PJT 등), 한때는
+`todo-cli/`처럼 실제 프로젝트 폴더가 하네스 안에 들어와 있기도 했다. 전부 하네스 폴더 바깥으로
+제거·이전 완료 — 이 하네스는 이제 프로젝트 인스턴스를 전혀 포함하지 않는다.
+
 (정책 근거: `ORCHESTRATION.md`의 "루프/폭주 방지 정책" 참고)
 
 ## 형식
 
 ```
-[YYYY-MM-DD HH:MM] 호출자 → 대상 에이전트 (대상: feature ID 또는 작업명, 시도 N회차) — 사유
+[YYYY-MM-DD HH:MM] 호출자 → 대상 에이전트 (대상: 작업명, 시도 N회차) — 사유
 ```
 
 ## 로그
 
-[2026-09-11] PM → implementer-A (대상: F1/F3/F4/F5 데이터 계층, 시도 1회차) — 최초 구현 착수
-[2026-09-11] PM → implementer-B (대상: F2/F6 UI/메뉴 계층, 시도 1회차) — 최초 구현 착수
-[2026-09-11] 관찰: implementer-A/B가 동시에 todo-cli/taskStore.js에 write 경쟁 발생 (implementer-B가 먼저 stub 작성 → implementer-A가 실제 구현으로 덮어씀). 계약이 동일해서 우연히 호환됐지만, 병렬 구현 에이전트 간 파일 잠금/조율 메커니즘 부재가 실제 리스크로 확인됨. 후속 정책 논의 필요.
-[2026-09-11] PM → team-lead (대상: F1~F6 전체 통합, 시도 1회차) — implementer-A/B 산출물 통합 및 검증 요청
-[2026-09-11 14:50] team-lead → tester (대상: F1~F6 전체 검증, 시도 1회차) — implementer-A/B 통합 산출물(todo-cli/taskStore.js, index.js) 전체 기능 검증 요청
-[2026-09-11 15:05] tester → team-lead (대상: F1~F6 전체 검증, 시도 1회차 결과) — F1 PASS, F2 PASS, F3 PASS, F4 PASS, F5 PASS, F6 PASS (전건 통과, 재호출 불필요)
-[2026-09-11] PM → spec-writer (대상: 로그 데이터 관리 PJT — SPEC_LOG_PJT.md, 시도 1회차) — 사용자 요청(1649641에 Setting 버튼 추가 + 별도 로그 관리 페이지 신설·연동, 산출물 1649641-pjt2) + PM이 사전 조사한 기존 코드/스타터 자료 컨텍스트 + 사용자와 확정한 3가지 결정사항(직접 수정, 별도 페이지 이동, Functions 배포는 PM이 직접)을 전달하여 최초 스펙 작성 요청
-[2026-09-11] PM: SPEC_LOG_PJT.md 검토 완료 — 미확정 사항 10개 전부 PM의 MVP 기본 결정으로 해소(§5), 구현 소유권을 배타적 경로 3분할로 확정(§6). 사용자 재확인 불필요 판단(todo-cli 선례와 동일 패턴).
-[2026-09-11] PM → implementer-A (대상: F200 인포테인먼트 쪽 — pjt2/1649641/, 시도 1회차) — Setting 버튼 추가 착수
-[2026-09-11] PM → implementer-B (대상: F200(로그앱 쪽)/F201/F204/F205/F206/F207 — pjt2/1649641-pjt2/ 프런트엔드, 시도 1회차) — 로그 관리 웹앱 프런트엔드 구현 착수
-[2026-09-11] PM → implementer-C (대상: F202/F203 — pjt2/1649641-pjt2/functions/, 시도 1회차) — Firebase Functions 정제 파이프라인 구현 착수
-[2026-09-11] implementer-A → PM (결과) — index.html 1개 파일만 수정(Setting 버튼 1개 추가), CSS/JS 변경 불필요 확인, 회귀 없음
-[2026-09-11] implementer-C → PM (결과) — F202/F203 전체 구현, parseLog 단위테스트 6건 전부 PASS(직접 node 실행), firestore.rules 작성. 판단콜 1건 보고(비인증 create 허용)
-[2026-09-11] implementer-B → PM (결과) — F200(로그앱쪽)/F201/F204/F205/F206/F207 전체 구현, 구문체크 통과. CODING_GUIDE §3(주석 영어) 편차 자진 보고, 실브라우저 미검증 명시
-[2026-09-11] PM → team-lead (대상: F200~F207 전체 통합·검증, 시도 1회차) — 3개 구현물(배타적 경로, 스크래치 격리 없이 직접 최종 경로에 작성됨) 통합 및 tester 위임 요청
-[2026-09-11] team-lead: 스크래치 디렉터리 없음(0단계 생략 지시) — 배타적 경로 직접 작성 확인, 통합 시작. env.js 신규 생성(PM 전달 실제 Firebase config 값), .gitignore의 env.js 등록 확인 완료. app.js/upload.js/parseLog.js 계약 대조(timestamp/user/log_level/message) 일치 확인. node --check로 app.js/upload.js/parseLog.js/functions/index.js 구문 확인, functions/test/parseLog.test.js 독립 재실행 6/6 PASS.
-[2026-09-11 17:05] team-lead → tester (대상: F200, 시도 1회차) — 인포테인먼트 Setting 버튼 + 로그앱 홈 복귀 버튼 양방향 내비게이션 검증 요청 (라이브 브라우저 불가, 정적 코드 리뷰로 대체 지시)
-[2026-09-11 17:05] team-lead → tester (대상: F201, 시도 1회차) — 원시 로그 업로드(줄 분리/빈 줄 필터/에러 피드백) 검증 요청 (라이브 Firestore 불가, 정적 코드 리뷰로 대체 지시)
-[2026-09-11 17:05] team-lead → tester (대상: F202/F203, 시도 1회차) — parseLog 정제 로직 + telematics_logs 저장 구조 검증 요청 (node로 직접 독립 재실행 지시, implementer-C 자기보고 신뢰 금지)
-[2026-09-11 17:05] team-lead → tester (대상: F204/F205/F206/F207, 시도 1회차) — 실시간 시각화/필터링/색상 차별화/사용자 필터 검증 요청 (라이브 Firestore 불가, 정적 코드 리뷰로 대체 지시)
-[2026-09-11 17:10] tester → team-lead (대상: F200, 시도 1회차 결과) — PASS (7개 수용 기준 전부, 정적 코드 리뷰 8건. 라이브 브라우저 렌더링/클릭 미검증 명시)
-[2026-09-11 17:10] tester → team-lead (대상: F201, 시도 1회차 결과) — PASS (6개 수용 기준 전부, 순수 로직 Node 직접 실행 13건 + 1000줄 합성 데이터. AC6 순서 보장 관련 경계 관찰 1건 PM 확인 필요로 별도 보고. vehicle_logs_1000_with_missing.txt 샘플 파일 미발견, 합성 데이터로 대체)
-[2026-09-11 17:10] tester → team-lead (대상: F202/F203, 시도 1회차 결과) — PASS (기존 6건 독립 재실행 + 신규 10건 직접 작성/실행, 16/16 Node로 직접 확인, implementer-C 자기보고 신뢰하지 않고 독립 재검증. -0 미필터링 경계 관찰 1건 기록)
-[2026-09-11 17:10] tester → team-lead (대상: F204/F205/F206/F207, 시도 1회차 결과) — 4개 전부 PASS (순수 로직 30건 + 정적 구조 검증 17건, Node 직접 실행 47건 전부 통과. onSnapshot 실시간성/실제 렌더링 라이브 미검증 명시)
-[2026-09-11] team-lead: 4개 그룹 전부 1회차 PASS, 재호출(3-strikes) 불필요. SPEC_LOG_PJT.md §7 구현 현황 섹션 신설·기록 완료.
-[2026-09-11] team-lead → PM (결과) — checkpoint 커밋(632f5d5)이 실제로는 SPEC/RUN_LOG 문서만 커버함을 보고. pjt2/1649641-pjt2가 ppjt2 git 바깥(형제 폴더)이라 실제 앱 코드는 무방비 상태였음을 발견·보고.
-[2026-09-11] PM — pjt2/1649641-pjt2에 신규 git repo init + 커밋(ac513b9) — 사용자 승인 받고 진행, 안전망 확보.
-[2026-09-11] PM — pjt2/1649641 Setting 버튼 커밋(c44bcd5), 원격을 신규 PJT2 저장소(lab.ssafy.com/s16/a20/20260911-pjt-2/1649641.git)로 교체, 템플릿 README와 병합(2957b01) 후 push — 사용자 지시 및 승인.
-[2026-09-11] PM — firebase deploy --only functions:processRawLogs --project pjt2-c3b41 실행 성공(Node 20 런타임으로 상향, helloWorld는 미변경) — 사용자 승인. pjt2/1649641-pjt2에 커밋(30599b2).
+[2026-09-14] PM → agent-builder (대상: tech-spec-writer 신설, 시도 1회차) — hollinone 프로젝트에서 발견된 gap(spec-writer가 코드를 못 읽어 기술 스펙 작성에 못 씀) 해소를 위해 신규 에이전트 정의 요청. 결과: `.claude/agents/tech-spec-writer.md` 작성 완료, 권한 Read/Grep/Glob/Write 부여(Edit·Bash 없음 — 읽기전용/미실행 제약), 웹 문서 접근이 필요하면 WebFetch 추가 여부를 PM이 재확인해야 함을 보고받음. ORCHESTRATION.md 팀 구조도·에이전트 등록표에 반영 완료.
+[2026-09-14] PM — tester.md에 "회귀 우선" 규칙 추가(0단계: 기존 테스트 먼저 재실행 후 신규 테스트는 누적, 삭제 금지) — 사용자 승인, 하네스 리뷰 개선사항 #1 반영.
+[2026-09-14] PM — RUN_LOG.md 범위 정리: 하네스 로그와 프로젝트별 로그를 분리(위 범위 설명 참고), ORCHESTRATION.md에 "RUN_LOG.md 범위 규칙" 신설 — 사용자 승인.
+[2026-09-14] PM — 폴더/파일 구조 정리 1차(사용자 승인): 깨진 gitlink `1649641`(서브모듈 미등록, 빈 폴더) 제거 / `SPEC.md`(todo-cli 것)를 `todo-cli/SPEC.md`로 이동해 `RUN_LOG.md`와 위치 통일 / 코드가 이 워크스페이스에 없는 로그PJT 관련 파일(`SPEC_LOG_PJT.md`, `16-C-1-02.pdf`, `RUN_LOG_ARCHIVE.md`)을 `_archive/log-pjt/`로 통합 이동 + README 추가 / `HANDOFF.md`를 전면 재작성(기존 내용이 거의 전부 `pjt2/ppjt2`라는 다른 사본의 프로젝트 진행상황이었음 — ORCHESTRATION.md와 중복되는 일반 지식은 제거하고 하네스 레벨 정보만 남김, "완료된 프로젝트 SPEC도 매번 필수로 읽어라"던 잘못된 읽기 순서 수정) / `CODING_GUIDE.md` §6의 존재하지 않는 워크스페이스 경로 예시 문구 일반화.
+[2026-09-14] PM — 폴더/파일 구조 정리 2차(사용자 확정: "구체적인 프로젝트가 아니라 에이전트만을 위한 하네스"): 1차에서 만든 `_archive/log-pjt/`를 완전히 삭제(원본이 `pjt2-master/pjt2/ppjt2`에 이미 있어 중복이었고, 범용 템플릿에 프로젝트 구체 내용을 남기지 않는다는 원칙과 배치됨) / `todo-cli/`(코드+SPEC.md+RUN_LOG.md 전체)도 동일 원칙으로 완전히 제거 — 첫 시험 운행 증빙은 `CHANGELOG.md`의 텍스트 요약만으로 충분, 실제 프로젝트 폴더가 하네스 안에 있을 필요 없음 / `ORCHESTRATION.md`·`CODING_GUIDE.md` 상단의 특정 프로젝트명(`ppjt2`) 하드코딩 문구를 전부 일반화 / `HANDOFF.md`·`ORCHESTRATION.md`(RUN_LOG.md 범위 규칙)를 "하네스는 프로젝트 폴더를 절대 포함하지 않는다"는 확정 원칙에 맞춰 재정리.
