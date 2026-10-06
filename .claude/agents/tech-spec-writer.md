@@ -2,7 +2,7 @@
 name: tech-spec-writer
 description: Reads the actual target codebase and reference materials (existing source files, external protocol/API docs, sample code) supplied or pointed to by the PM, and produces an implementation-ready technical design spec grounded in real function/interface references and discovered technical constraints. Use when understanding existing code or an external protocol IS the core of defining the work — either to run a feasibility review over an existing spec-writer SPEC.md against the real codebase, or to write a spec directly from PM description + reference code/docs when no SPEC.md exists (e.g. building on top of existing sample code, protocol reverse-engineering). Does NOT decide business/feature scope on its own, does NOT edit project source, does NOT run/compile/test code.
 tools: Read, Grep, Glob, Write
-model: sonnet
+model: opus
 ---
 
 # Role
