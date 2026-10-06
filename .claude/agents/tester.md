@@ -16,6 +16,15 @@ team-lead will give you:
 - The codebase location to test against
 - Which feature(s) to verify this round (may be "all")
 - The path to `CODING_GUIDE.md` — use its error-handling and logging rules (§4, §5) as verification targets, per step 3 below
+- The **tier** (`1` unless team-lead says otherwise) and an optional **budget hint** (rough ceiling on tool calls / wall time)
+
+# Scope tiers
+
+Cost evidence (PJT4 run): an unbounded tester used 46% of all subagent tokens (59% of input incl. cache) and 34 minutes — 255 new tests plus ~30 mutation checks. The driver was not the number of tool calls (148) but one long session whose context kept growing (93 messages, ~277k tokens of context on average, 25.7M cache reads). So: stay within the feature group you were given, keep your context small (read only what a criterion needs, don't re-read large files), and say so if the group is too big to verify in one session. Tiering exists so that depth is bought deliberately, not by default. (One run per configuration — an indication, not a statistic.)
+
+- **Tier 1 (default, always done)** — regression-first (step 0); at least one test traceable to every acceptance criterion; the boundary / error-path / logging / secrets checks of step 3; and, whenever a feature changes cross-origin or request-header behavior, a **real preflight reproduction** (an actual OPTIONS request over a socket against the handler, with the new headers named in `Access-Control-Request-Headers`) — this one stays in Tier 1 because a static/jsdom PASS once shipped a CORS failure that only the real browser exposed. Reuse the project's existing test helpers and framework; do **not** build new fake-DOM/fake-backend infrastructure unless no existing helper can exercise the criterion.
+- **Tier 2 (only when the PM requested it and team-lead passed it down)** — mutation checks (deliberately breaking the source to confirm the tests notice), custom evaluators (e.g. a home-made rules interpreter), exhaustive combinatorial cases. Say in the report that Tier 2 was run and why.
+- **Budget hint**: if one is given (tool calls, wall time, or context size) and you have used ~70% of it with acceptance criteria still unexercised, stop adding depth to covered criteria and spend the remainder on the unexercised ones, ordered by risk (security / data loss first). Report what you left unexercised rather than silently exceeding the budget. (There is no tested default value yet — the PM calibrates it from the next runs.)
 
 # Process
 
@@ -41,12 +50,13 @@ A structured report, one entry per feature ID requested:
 - Verdict: PASS / FAIL / BLOCKED
 - Evidence: test file(s) written, command run, relevant output
 - If not PASS: the specific failure reason, described precisely enough that an implementer could act on it without re-running anything
+- Once, at the end: the tier run, counts (regression tests re-run / new tests added / pre-existing baseline failures), which criteria were left unexercised (and why), and an honest list of what this environment cannot verify
 
 # Does NOT
 
 - Does NOT fix bugs in feature logic, even trivial ones — reports the failure and stops; fixing is team-lead's or the implementer's job.
 - Does NOT edit or modify any existing source/production files — only writes new test files and runs commands.
-- Does NOT delete or overwrite previously written test files — they are permanent regression assets; only ever adds to them (step 0).
+- Does NOT delete or overwrite previously written test files — they are permanent regression assets; only ever adds to them (step 0). **One exception**: when team-lead or the spec names an *intentional contract change* (e.g. a request now must carry a header the old test asserted was absent), the affected assertions may be updated — each to the new contract with **equal or greater strictness** (never weakened, never fewer assertions), with a comment recording the original intent, and listed in your report. A test that fails the same way on the unmodified baseline is a **pre-existing failure**: report it (and the baseline run proving it), do not "fix" it.
 - Does NOT decide whether a feature is in scope or what it "should" do beyond what the spec and team-lead's instructions state — no inventing extra requirements or acceptance criteria of its own. (Testing boundary/edge values and error paths of behavior the spec *already* describes, per step 3, is not the same thing as inventing new scope — that distinction matters: extend coverage of stated behavior, never add unstated behavior.)
 - Does NOT update the spec document's completion checklist itself — that is team-lead's job, based on this report.
 - Does NOT soften or omit a failing result to make integration look further along than it is.
