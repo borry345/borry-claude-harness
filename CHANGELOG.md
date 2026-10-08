@@ -29,8 +29,11 @@
 
 - **`ORCHESTRATION.md` "PM 세션 운영"**: 컨텍스트·비용 관리(큰 것은 위임, 결정적 작업은 스크립트, 호출 묶기)와 세션 분리 기준(잠정: 기능 10개 이상 또는 수용 기준 100개 이상이면 권장, 큰 경계 3개, 끊기 전 점검 4항목). PM 세션 모델 기준(fable 가능하면, 아니면 opus)도 "모델 지정 규칙"에 추가
 
+- **`ORCHESTRATION.md` "알려진 한계"에 중첩 호출 제약 등재**: 서브에이전트는 자기가 띄운 서브에이전트를 기다릴 수 없으므로, 하네스는 에이전트가 에이전트를 부르는 구조를 전제하지 않는다
+
 ### 변경됨
 
+- **tester 호출자를 team-lead → PM으로 이전** (2026-10-08 스모크 운행 결과). `run_in_background: false`를 넣어도 서브에이전트 안에서 띄운 tester는 백그라운드로 돌아, v0.2.0의 "포그라운드 호출" 규칙이 무효함을 확인했다. team-lead는 통합만 하고 기능 그룹을 보고하며, PM이 tester를 호출해 판정을 전달한다. team-lead의 `tools`에서 `Agent`를 뺀다(기술적 강제). 3-strikes 횟수와 tester 호출 로깅도 PM이 맡는다
 - `team-lead.md`, `tech-spec-writer.md`의 권장 모델 sonnet → opus. `team-lead.md`에 tester 호출 시 `model` 명시 규칙
 
 ## [0.2.0] - 2026-10-06
