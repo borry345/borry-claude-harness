@@ -23,17 +23,20 @@ RUN_LOG.md가 같은 내용을 중복해서 담고 있다"는 지적을 계기�
 
 - PJT4 비교 실험(하네스 vs 단일 세션) 이후 개선 묶음 A·B·C(tester 운영, 계약·PM 행동 규칙, 종료 체크리스트·설치 스크립트)를 문서·에이전트 정의에 반영해 `v0.2.0`으로 커밋·태그했다. 무엇을 왜 바꿨는지는 `RUN_LOG.md` 최신 항목과 `CHANGELOG.md`를 본다. 측정·평가 도구(묶음 D: 사용량 집계 스크립트, 블라인드 채점 절차, RUN_LOG 태그)는 **보류**.
 
-- 2026-10-08: 스모크 운행에서 **서브에이전트는 자기가 띄운 서브에이전트를 기다릴 수 없다**는 것이 확인되어 **tester 호출자를 team-lead → PM으로 이전**했다(team-lead에서 `Agent` 도구 제거). 에이전트가 에이전트를 부르는 구조는 이제 전제하지 않는다(`ORCHESTRATION.md` "알려진 한계"). 설치 스크립트·`CLAUDE.md` 자동 로드·`model` 인자 우선·git 승인 게이트는 정상 동작을 확인했다.
+- 2026-10-08: 스모크 운행(새 CLI 프로젝트 한 바퀴)에서 **중첩 호출은 포그라운드 대기가 보장되지 않는다**는 것이 확인되어 **tester 호출자를 team-lead → PM으로 이전**했다(team-lead에서 `Agent` 도구 제거 — 단 우회 호출 경로에서는 소프트 제약). 에이전트가 에이전트를 부르는 구조는 전제하지 않는다. **PM → tester 포그라운드는 같은 턴에 보고가 돌아오는 것을 확인**했다. 설치 스크립트·`CLAUDE.md` 자동 로드·`model` 인자 우선·git 승인 게이트도 정상이었다. 다만 그 세션에서는 **커스텀 `subagent_type`이 네이티브로 노출됐다**(아래 "네이티브 미지원" 항목은 환경에 따라 다름 — 반드시 실제 목록을 확인할 것). 상세는 `ORCHESTRATION.md` "알려진 한계".
 - 2026-10-07: 모델 지정 규칙·tester 독립 검증 모드·PM 세션 운영을 추가했다(**커밋됨(c47ca22), 실운행 시험 전이라 태그 없음** — 최신 태그는 `v0.2.0`=a5304b7, 릴리스 절차는 `CHANGELOG.md` "릴리스 규칙"). 호출할 때 `model` 인자를 직접 넘겨야 한다(우회 호출은 정의 파일의 `model:`을 적용하지 않음). 내용은 `ORCHESTRATION.md` "모델 지정 규칙"·"독립 검증"과 `CHANGELOG.md` `[Unreleased]`.
 
 ## 잊으면 안 되는 것 (ORCHESTRATION.md에 이미 있지만 특히 놓치기 쉬운 것만 재강조)
 
-- **네이티브 서브에이전트 타입 미지원**: `.claude/agents/*.md`의 커스텀 이름(`spec-writer`,
-  `team-lead` 등)은 Agent 도구의 네이티브 `subagent_type`으로 뜨지 않는다(뜨는 건 `claude`,
-  `claude-code-guide`, `Explore`, `general-purpose`, `Plan`, `statusline-setup`뿐 — 환경마다
-  다를 수 있으니 실제 목록을 확인할 것). 항상 `subagent_type: "general-purpose"` +
-  "`.claude/agents/<이름>.md` 정의를 그대로 따르라"는 프롬프트로 우회한다
-  (`ORCHESTRATION.md`의 "알려진 한계" 참고).
+- **네이티브 서브에이전트 타입 지원 여부는 환경마다 다르다 — 세션 시작 때 실제 목록을 본다.**
+  `.claude/agents/*.md`의 커스텀 이름(`spec-writer`, `team-lead` 등)이 Agent 도구의
+  `subagent_type`으로 뜨는 세션도 있고(2026-10-08 스모크 프로젝트), `claude`,
+  `claude-code-guide`, `Explore`, `general-purpose`, `Plan`, `statusline-setup`만 뜨는
+  세션도 있다(같은 날 하네스 폴더 세션). **보이면 네이티브 타입을 쓰고, 안 보이면**
+  `subagent_type: "general-purpose"` + "`.claude/agents/<이름>.md` 정의를 그대로 따르라"는
+  프롬프트로 우회한다. 우회 경로에서는 정의 파일의 `model:`이 적용되지 않고(실측 확인)
+  `tools:`도 적용되지 않을 것으로 보므로, 모델은 호출 인자로 넘기고 도구 제한은 소프트
+  제약으로 간주한다 (`ORCHESTRATION.md`의 "알려진 한계" 참고).
 - **git commit/tag/push는 항상 사용자와 상의**(체크포인트 커밋 스크립트 예외) — 상세 근거는
   `ORCHESTRATION.md`의 "구현 에이전트 디스패치 원칙" 참고.
 - **하네스는 프로젝트 루트에 "설치"해야 한다**(`scripts/install-into-project.sh <프로젝트 루트>`). 옆 폴더에 두고 작업하면 `CLAUDE.md` 자동 로드, `settings.json`의 git 승인 게이트, `checkpoint-commit.sh`가 전부 꺼진다 — PJT4가 그렇게 진행돼 체크포인트 단계를 계속 생략했다.

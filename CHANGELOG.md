@@ -33,7 +33,7 @@
 
 ### 변경됨
 
-- **tester 호출자를 team-lead → PM으로 이전** (2026-10-08 스모크 운행 결과). `run_in_background: false`를 넣어도 서브에이전트 안에서 띄운 tester는 백그라운드로 돌아, v0.2.0의 "포그라운드 호출" 규칙이 무효함을 확인했다. team-lead는 통합만 하고 기능 그룹을 보고하며, PM이 tester를 호출해 판정을 전달한다. team-lead의 `tools`에서 `Agent`를 뺀다(기술적 강제). 3-strikes 횟수와 tester 호출 로깅도 PM이 맡는다
+- **tester 호출자를 team-lead → PM으로 이전** (2026-10-08 스모크 운행 결과). 서브에이전트 안에서 띄운 tester는 `run_in_background: false`를 넣어도 비동기로 전환된다. 그 뒤는 일정하지 않아서 — 그 운행에서는 team-lead가 완료 알림으로 판정을 마쳤고, PJT4에서는 빈 채로 반환해 PM이 3번 호출해야 했다 — v0.2.0의 "포그라운드 호출" 규칙은 믿을 수 없는 전제였다. team-lead는 통합만 하고 기능 그룹을 보고하며, PM이 tester를 호출해 판정을 전달한다(**PM 포그라운드 호출은 같은 턴에 보고가 돌아오는 것을 확인**). team-lead의 `tools`에서 `Agent`를 뺐다 — 다만 우회 호출 경로에서는 `tools:`가 적용되지 않을 것으로 보여 **소프트 제약**이다. 3-strikes 횟수와 tester 호출 로깅도 PM이 맡는다
 - `team-lead.md`, `tech-spec-writer.md`의 권장 모델 sonnet → opus. `team-lead.md`에 tester 호출 시 `model` 명시 규칙
 
 ## [0.2.0] - 2026-10-06
