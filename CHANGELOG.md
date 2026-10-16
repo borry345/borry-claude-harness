@@ -16,11 +16,55 @@
 4. **버전 번호는 태그를 붙일 때 위 기준(PATCH/MINOR)으로 정한다.** 새 에이전트가 없고 기존 팀의 선택 옵션·규칙을 보강한 정도면 PATCH다. 사용자가 번호를 지정하면 그것을 따른다.
 5. **버전이 붙은 항목을 나중에 고치지 않는다.** 이미 태그된 `[x.y.z]` 항목은 역사 기록이다. 정정이 필요하면 `[Unreleased]`에 "정정" 항목으로 쓴다.
 
-현재 상태(2026-10-08): 최신 태그 `v0.2.1` = 아래 `[0.2.1]` 항목의 릴리스 커밋(로컬·원격 동일). `[Unreleased]`는 비어 있다.
+현재 상태(2026-10-16): 최신 태그 `v0.2.2` = 아래 `[0.2.2]` 항목의 릴리스 커밋. `[Unreleased]`는 비어 있다.
 
 ## [Unreleased]
 
 (없음)
+
+## [0.2.2] - 2026-10-16
+
+PJT5(`1649641`) 전 구간 실운행으로 시험했다. 새 에이전트가 없고 기존 팀의 도구·규칙 보강과 스킬 신설이라 PATCH다.
+
+### 변경됨
+
+- **문서 생산 에이전트 4종에 `Edit` 부여**: `spec-writer`(`Read, Edit, Write`), `tech-spec-writer`(`Read, Edit, Grep, Glob, Write`), `doc-writer`(`Read, Edit, Write`), `agent-builder`(`Read, Edit, Write, Glob`). 네 정의 파일에 "기존 파일 수정은 `Edit`로, `Write`는 신규 파일 생성에만" 규칙(`# File writing rule`)을 명문화하고, `agent-builder`에는 새 에이전트에 도구를 줄 때 같은 기준을 적용하라는 항목을 추가했다.
+  - **계기**: PJT5에서 실제로 두 번 발현됐다. `spec-writer`가 `SPEC.md` 604줄을 `Write`로 전량 재작성해 개행이 CRLF→LF로 바뀌었고(PM이 복원), `tech-spec-writer`는 `Edit`가 없어 `No such tool available: Edit`를 받고 `TECH_SPEC.md`를 수정하지 못해 스크래치에 단편만 남겼다(PM이 수작업 append).
+  - **근거**: 위험한 도구는 `Edit`가 아니라 **기존 파일을 통째로 덮어쓰는 `Write`**다. 전량 재작성은 개행 변환·비ASCII 깨짐(`CODING_GUIDE.md` §7의 실제 사고)·재입력부의 조용한 변형을 부른다. `Edit`는 앵커 불일치 시 실패하고 사전 Read를 요구하는 수술적 도구다. 공식 문서의 `debugger` 예시도 "기존 파일 수정이 일이면 `Edit`"로 `Edit`만 주고 `Write`는 주지 않으며, 공개 컬렉션 VoltAgent(161+ 서브에이전트)의 관례도 문서 에이전트에 `Read, Write, Edit, Glob, Grep, WebFetch, WebSearch`를 준다. 우리가 `Write`만 주고 `Edit`를 뺀 구성이 외부 기준선에서 벗어난 쪽이었다.
+
+### 추가됨
+
+- **`ORCHESTRATION.md` "알려진 한계" 3건**(2026-10-15 조사·실측):
+  - **`tools:`는 네이티브 경로에서 실제로 강제된다** — v0.2.1이 "측정하지 않았다"고 남겨둔 항목. `Edit`가 없던 `tech-spec-writer`가 네이티브 호출에서 `No such tool available: Edit`를 받은 것으로 확인(우회 경로에서 무시되는지는 여전히 미측정).
+  - **백그라운드 실행은 도구 목록을 한 번 더 거른다** — 백그라운드 서브에이전트는 빌트인 중 20개 + `SubagentHandback`만 남고 나머지는 `tools:`에 적어도 제거되므로, **같은 정의가 포그라운드와 백그라운드에서 다른 도구로 풀린다**. `Edit`·`Write`는 둘 다 살아남아 문서 작업에는 영향이 없고, `AskUserQuestion`·`Agent`·`ListAgents`는 빠진다.
+  - **파일 소유권의 기술적 강제 경로가 존재한다** — 서브에이전트 프런트매터의 `hooks:`에 `PreToolUse`(`matcher: "Edit|Write"`) 훅을 걸어 `tool_input.file_path`를 검사하고 exit code 2로 차단하면 그 에이전트에만 적용되는 진짜 경로 제한이 된다. 지금까지 "소프트 제약"으로 포기해둔 부분이다. 도입은 보류.
+  - 아직 쓰지 않는 프런트매터 필드 목록(`disallowedTools`, `permissionMode`, `maxTurns`, `omitClaudeMd`, `isolation`, `memory`, `skills`, `hooks`)도 함께 기록.
+- **`DESIGN_NOTES.md` 백로그 3건**(PJT5 종료 후 반영 예정, 사용자 지시로 이번엔 `Edit` 부여만 적용): B1 `PreToolUse` 훅으로 파일 소유권 강제(workspace trust를 수락해야 훅이 돌고 수락 전에는 **조용히 건너뛰어진다**는 함정 포함, Windows라 PowerShell 변형 필요), B2 `revfactory/harness`의 도구 부여 관례 조사(지금까지 모델 배치만 가져왔음 — 외부 기준선 비교표 포함), B3 `tester`의 Write-only 구성 재검토(기존 테스트 단언 갱신 수요가 PJT4에 실제로 있었음).
+
+### 추가됨 (2026-10-16, PJT5 실운행 후)
+
+- **스킬 5종 신설** (`.claude/skills/*/SKILL.md`) — 하네스가 처음으로 `agents` 외의 공식 확장점을 쓴다. `ORCHESTRATION.md`는 `CLAUDE.md`가 "항상 읽는다"로 지정해 **매 세션 전량 로드**되므로, 반복 *절차*는 필요할 때만 로드되는 스킬로 옮긴다. 선정 기준은 "PJT5 한 운행에서 PM이 손으로 반복한 횟수"다.
+  - `dispatch-implementer` (13회 반복) — 디스패치 7블록 골격: 역할·범위, 배타적 파일 소유권, **검증 재현성**, **결정성**, 기준선, 금지, 보고 형식. 디스패치 후 PM이 할 일(보고 불신·전제 반박 시 실측·소유자 재개)까지.
+  - `eol-audit` (2회 + 그래도 전제 오판) — Git Bash의 `grep -c $'\r'`·`tr -cd '\r'`·`sed '\r$'`가 **조용히 틀린 답을 낸다**는 경고와 Python 바이트 검사, `core.autocrlf` 해석(작업트리 불일치는 커밋 내용에 영향 없음).
+  - `runlog-append` (6회) — `newline=""`로 CRLF 보존 append와 사후 바이트 검사. 셸 백틱·삼중따옴표 함정 포함.
+  - `baseline-handoff` — **모든 수치에 그 수치의 기준을 붙인다**는 규칙과 기계적 합격 기준의 위험.
+  - `pre-push-check` — 원격 상태, 스테이징 금지 대상(정규식 **끝 고정** — `env.js`가 `env.js.example`을 잡는다), 추적 파일 시크릿 스캔, 빌드 산출물 인라인 검사.
+- **`scripts/install-into-project.sh`가 `.claude/skills/`를 복사**한다. 없으면 스킬이 프로젝트에 설치되지 않는다.
+- **`CLAUDE.md` 지도에 "반복 절차" 행 추가** — 스킬이 필수 읽기가 아님을 명시하고, 절차를 `ORCHESTRATION.md`에 더 쌓지 말라는 근거를 적었다.
+- **`ORCHESTRATION.md` "실행 라운드에서 얻은 규칙" 10항목** — 전부 PJT5에서 실제로 난 사고 또는 **구현 에이전트가 PM을 반박해 PM이 틀린 것으로 밝혀진 건**이 근거다. 검증 재현성, 부하를 바꾼 결정성 측정, 기준선 수치의 기준 표기, 기계적 합격 기준 금지, 전제 실측, 요구사항 소유 화면 기준 코드 배치, 빨강 선행, 소유자 재개, tester 산출물 편입 판단, TECH_SPEC의 상태 신설 검토.
+
+### 변경됨 (2026-10-16, 권한)
+
+- **`permissions.deny` 신설** — 이 하네스의 모든 "금지"가 그동안 **산문뿐**이었다. PJT5에서 PM은 13개 에이전트 전부에 시크릿 파일 금지를 타이핑했고 기술적 강제는 0이었다. 범용 5건을 하네스 기본값으로 넣는다: `Read(./.env)`, `Read(./.env.*)`, `Read(./env.js)`, `Bash(git push --force:*)`, `Bash(git push -f:*)`. 강제 푸시 금지는 `ORCHESTRATION.md`가 산문으로만 막고 있던 것이다.
+- **`permissions.ask`에 3건 추가** — `Bash(git rm:*)`(PJT5에서 PM이 파일 3개를 게이트 없이 삭제했다), `Bash(git clean:*)`, `Bash(rm -rf:*)`(구현자 2명이 `node_modules`를 지워 자기 검증을 깼다. `deny`로 막으면 정상 정리까지 막히므로 `ask`가 비례한다).
+- **프로젝트 전용 `deny`는 프로젝트 사본에 둔다** — 하네스는 프로젝트에 종속되지 않는다(`HANDOFF.md` 원칙). PJT5 사본에는 수정 금지 파일(Functions·rules·firebase 설정·원본 데이터)을 `Edit`/`Write` deny로 10건 추가했다.
+- **한계를 `ORCHESTRATION.md` "알려진 한계"에 명시** — `deny`는 **도구 단위**라 `Read(./env.js)`를 막아도 `Bash(cat env.js)`는 다른 경로이고, Bash 패턴은 접두 매칭이라 다른 철자로 샌다. 완전한 경로 강제는 B1의 `PreToolUse` 훅이며, **사용자 레벨에서 훅이 실제로 도는 환경임을 확인**해 B1의 실현 가능성이 올라갔다.
+
+### 시험 결과 (v0.2.1 → v0.2.2에서 검증된 것)
+
+- **문서 생산 에이전트 `Edit` 부여가 실제로 효과를 냈다.** PJT5 실행 구간에서 문서 에이전트가 기존 파일을 `Edit`로 수정했고, v0.2.1에서 났던 전량 재작성·개행 변환 사고가 재발하지 않았다.
+- **`tools:`는 네이티브 경로에서 강제된다**(v0.2.1의 미측정 항목 중 네이티브 쪽 해소). 우회 경로는 여전히 미측정.
+- **서브에이전트가 PM의 틀린 전제를 반박하는 것이 반복 관측됐다**(3건, 전부 에이전트가 옳았다). 이것은 버그가 아니라 하네스가 의도한 "각 계층이 자기 눈에 보이는 문제를 감지한다"가 작동한 사례다 — `ORCHESTRATION.md` "이상 감지 책임 분담"의 실증.
 
 ## [0.2.1] - 2026-10-08
 

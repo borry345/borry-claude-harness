@@ -78,3 +78,54 @@
 - 3번(git worktree)이 가장 실험이 필요한 항목 — 실제로 시도해보지 않으면 오버헤드 대비 이득을
   확신하기 어렵다.
 - 1·2·4번은 비교적 바로 적용 가능한 구조적 결정이다.
+
+## PJT5 중 발견된 백로그 (2026-10-15 추가 — PJT5 종료 후 반영 예정)
+
+사용자 지시로 이번엔 **Edit 도구 추가만** 적용했고(완료: spec-writer·tech-spec-writer·doc-writer·
+agent-builder에 Edit 부여 + "기존 파일 수정은 Edit, Write는 신규 생성만" 규칙 명문화), 아래는
+다음으로 넘긴 항목이다.
+
+### B1. PreToolUse 훅으로 파일 소유권을 기술적으로 강제
+
+지금까지 `ORCHESTRATION.md`는 파일 소유권을 "소프트 제약"으로 포기해두었는데, 2026-10-15 조사에서
+**실제 강제 경로가 있다**는 것이 공식 문서로 확인됐다. 서브에이전트 프런트매터의 `hooks:` 필드에
+`PreToolUse` 훅을 `matcher: "Edit|Write"`로 걸고, 훅 스크립트가 stdin으로 받은 JSON의
+`tool_input.file_path`가 그 에이전트의 소유 파일인지 검사해 **exit code 2로 차단**한다. 훅은
+**그 서브에이전트에만** 적용되므로, 에이전트별로 다른 소유 경로를 줄 수 있다. 공식 문서의
+`db-reader` 예시가 같은 메커니즘으로 Bash SQL 쓰기를 막는다.
+
+- **이득**: 파일 소유권 원칙이 처음으로 프롬프트 의존에서 벗어난다. PJT4에서 실제로 났던 경합
+  사고(`taskStore.js` 동시 write)와 같은 부류를 사전 차단할 수 있다.
+- **함정 (도입 시 반드시 처리)**: 프로젝트 레벨 `.claude/agents/` 파일의 프런트매터 훅은 **그
+  폴더의 workspace trust를 수락해야 실행된다.** 수락 전에는 에이전트는 정상 동작하고 **훅만 조용히
+  건너뛰어진다**(디버그 로그에만 에러). 즉 "걸어뒀다고 믿었는데 안 걸린" 상태가 가능하므로, 세션
+  시작 체크리스트에 "훅이 실제로 동작하는지 1회 확인"을 넣어야 한다. `~/.claude/agents/`의 사용자
+  레벨 정의는 이 단계가 필요 없고, `-p` 세션은 trusted로 간주되지 않는다.
+- **추가 작업**: 검사 스크립트를 새로 만들어야 하고, 이 하네스는 Windows에서 돌아가므로 PowerShell
+  변형(`shell: powershell`)이 필요하다. 소유권 맵을 스크립트가 읽을 수 있는 형식(예: JSON)으로
+  둘지도 결정해야 한다 — 지금은 `TECH_SPEC.md` 본문의 표로만 존재한다.
+
+### B2. revfactory/harness의 도구 부여 관례 조사
+
+`ORCHESTRATION.md` "모델 지정 규칙"이 이 하네스를 비교 대상으로 인용하고 있으나 **가져온 것은
+모델 배치뿐**이고, 도구 부여(특히 문서 생산 에이전트에 Write/Edit를 어떻게 주는지) 관례는 확인한
+적이 없다. 2026-10-15에 조사한 것은 공식 Claude Code 문서와 VoltAgent 컬렉션 두 곳이다.
+
+참고로 그때 확인된 외부 기준선:
+
+| 출처 | 문서/쓰기 에이전트 도구 구성 |
+|---|---|
+| 공식 문서 `debugger` 예시 | `Read, Edit, Bash, Grep, Glob` — **Edit만 있고 Write 없음**("기존 파일 수정이 일이면 Edit") |
+| 공식 문서 `code-reviewer` 예시 | `Read, Grep, Glob, Bash` — Edit·Write 둘 다 제외 |
+| VoltAgent(161+ 서브에이전트) 관례 | read-only: `Read, Grep, Glob` / code writers: `Read, Write, Edit, Bash, Glob, Grep` / **documentation: `Read, Write, Edit, Glob, Grep, WebFetch, WebSearch`** / research: `Read, Grep, Glob, WebFetch, WebSearch` |
+
+VoltAgent 쪽 문서 에이전트에는 `WebFetch`/`WebSearch`가 들어 있는데, 우리 doc-writer는 "스스로
+조사하지 않는다"가 설계 의도이므로(위 "조사와 문서화는 분리한다") **의도적 차이로 유지**한다.
+
+### B3. tester의 Write-only 구성 재검토
+
+tester는 `Read, Edit, Write, Bash, Glob, Grep`이 아니라 `Read, Write, Bash, Glob, Grep`이다. 신규
+테스트 파일 작성은 Write로 충분하지만, PJT4에서 tester가 **기존 테스트의 단언을 갱신**해야 하는
+상황이 실제로 있었다(그때는 team-lead가 대신 처리). 같은 Write-전체덮어쓰기 위험이 테스트 파일에도
+있으므로 Edit 부여를 검토한다. 다만 tester가 소스를 고치지 못하게 막는 것은 별개 문제이고(현재도
+소프트 제약), B1의 훅과 함께 다루는 것이 자연스럽다.

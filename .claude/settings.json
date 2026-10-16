@@ -1,5 +1,12 @@
 {
   "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./env.js)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ],
     "ask": [
       "Bash(git commit:*)",
       "Bash(git tag:*)",
@@ -8,7 +15,10 @@
       "Bash(npm install:*)",
       "Bash(npm i:*)",
       "Bash(yarn add:*)",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "Bash(git rm:*)",
+      "Bash(git clean:*)",
+      "Bash(rm -rf:*)"
     ],
     "allow": [
       "Bash(sh scripts/checkpoint-commit.sh:*)",

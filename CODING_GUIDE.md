@@ -19,6 +19,13 @@
 - 변수/함수: camelCase (예: `taskList`, `addTask`)
 - 상수: UPPER_SNAKE_CASE (예: `MAX_TITLE_LENGTH`)
 - 파일명: camelCase (예: `taskStore.js`, `userProfile.js`)
+- **예외 — 프레임워크 컴포넌트 파일은 그 생태계의 관례를 따른다 (2026-10-15 신설)**: Vue 싱글 파일
+  컴포넌트(`.vue`)는 PascalCase로 쓴다 (예: `ChartPanel.vue`, `LogFilterBar.vue`). React의 `.jsx`/`.tsx`
+  컴포넌트도 같다. 근거: 컴포넌트 파일명이 템플릿에서 쓰는 태그 이름과 일치해야 하고, 프레임워크
+  도구·린터·문서가 전부 PascalCase를 전제하므로 camelCase를 고집하면 생태계 관례와 어긋나 오히려
+  읽기 어려워진다. **`.vue`/`.jsx`/`.tsx`가 아닌 파일(`.js`, `.ts`, `.css` 등)은 예외 없이 camelCase를
+  유지한다** — 컴포저블(`useLogFilter.js`), 서비스(`authService.js`), 스토어(`logStore.js`)가 모두 여기
+  해당한다. (계기: PJT5의 전면 Vue 마이그레이션에서 이 충돌이 미확정 사항으로 올라옴.)
 - 이름은 축약보다 명확함을 우선한다 (`tsk`보다 `task`)
 
 ## 3. 주석/문서화 규칙

@@ -80,6 +80,13 @@ for f in "$HARNESS"/.claude/agents/*.md; do
   [ -f "$f" ] && copy_one ".claude/agents/$(basename "$f")"
 done
 
+# 스킬 (절차. ORCHESTRATION과 달리 필요할 때만 로드되므로 반복 절차는 여기에 둔다)
+if [ -d "$HARNESS/.claude/skills" ]; then
+  for d in "$HARNESS"/.claude/skills/*/; do
+    [ -d "$d" ] && [ -f "$d/SKILL.md" ] && copy_one ".claude/skills/$(basename "$d")/SKILL.md"
+  done
+fi
+
 # 권한 설정(git 승인 게이트) — 사용자의 기존 설정이 있으면 --force 없이는 건드리지 않는다(위 규칙).
 copy_one ".claude/settings.json"
 

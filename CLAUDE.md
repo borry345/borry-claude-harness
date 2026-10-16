@@ -17,6 +17,7 @@
 | 변경 통제 | `.claude/settings.json`(permissions.ask) + `ORCHESTRATION.md` "체크포인트/의미있는 커밋 이원화" | `git commit/tag/push/reset`, `npm install` 등은 프롬프트가 아니라 실제 승인 게이트로 강제됨 |
 | 고위험 행동 차단 | `.claude/settings.json`(permissions.ask/allow) | 도구 권한 레벨의 기술적 강제 — 소프트 제약이 아님 |
 | 개발 작업 안전 | `ORCHESTRATION.md` "구현 에이전트 디스패치 원칙" | 파일 소유권, 스크래치 디렉터리 격리, 3-strikes 재시도 상한 |
+| 반복 절차 | `.claude/skills/*/SKILL.md` | **필수 읽기 아님** — 필요할 때 로드된다. 디스패치 골격(`dispatch-implementer`), 개행 바이트 감사(`eol-audit`), RUN_LOG 안전 append(`runlog-append`), 기준선 전달(`baseline-handoff`), 푸시 전 점검(`pre-push-check`). 절차를 `ORCHESTRATION.md`에 더 쌓지 말고 여기에 둔다 — 그 파일은 매 세션 전량 로드된다 |
 | 코드 스타일/아키텍처 | `CODING_GUIDE.md` | 최소 수정 원칙, 네이밍, 에러 처리, 로깅, 시크릿 관리 |
 | 사용자와 프로젝트 맥락 | *(하네스 레벨엔 의도적으로 없음)* — 각 프로젝트 루트의 `PRD.md`(있는 경우)/`SPEC.md`/`TECH_SPEC.md` | 하네스는 특정 프로젝트에 종속되지 않는다는 원칙(`HANDOFF.md`) 때문에 여기 두지 않음 |
 | 대화 방식 | *(아직 정의 안 됨)* | 필요해지면 원본 문서를 정하고 이 표에 행을 추가 |
