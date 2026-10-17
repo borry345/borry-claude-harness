@@ -66,3 +66,13 @@ After writing the file, report back in 3 lines max:
 - When scoping tools for a NEW agent: an agent that modifies existing files needs `Edit`. Grant
   `Write` only when it must create new files. `Write` on an existing file is a full overwrite, so it
   is the more dangerous of the two grants.
+- Frontmatter is enforced only on the native and `@`-mention invocation paths. On the PM's fallback
+  path (`general-purpose` + "follow this definition file") the frontmatter is prompt text: `model:`
+  and `tools:` are both ignored, measured 2026-10-16 — a probe limited to `tools: Read` was handed
+  `Write`/`Edit`/`Bash` and wrote a file with no prompt and no error. So write `tools:` as the
+  intended grant, and state the agent's hard boundaries in the body prose too, because on that path
+  the prose is the only thing that survives.
+- An agent whose job depends on a repeatable procedure may name it in `skills:` (the full skill text
+  is injected at startup, so name only what that agent actually needs). On the fallback path this
+  field is ignored as well, so the PM must point the agent at the skill file in the dispatch prompt
+  — note that in the definition rather than assuming the field will deliver it.

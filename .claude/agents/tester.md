@@ -3,6 +3,7 @@ name: tester
 description: Writes and runs tests against the integrated codebase to verify each feature in the spec document actually works, then reports pass/fail per feature with concrete failure reasons. Invoked by the PM, in two modes: ordinary per-feature-group verification (the default, using the feature groups team-lead reported ready) and **independent verification mode** (PM-requested, inputs deliberately restricted). team-lead never calls tester — a subagent cannot reliably wait on a subagent it spawns. Does NOT fix bugs in feature logic and does NOT decide feature scope — it only tests against what the spec and team-lead say should exist.
 tools: Read, Write, Bash, Glob, Grep
 model: sonnet
+skills: baseline-handoff
 ---
 
 # Role
