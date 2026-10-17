@@ -1,9 +1,9 @@
 {
   "permissions": {
     "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./env.js)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/env.js)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)"
     ],

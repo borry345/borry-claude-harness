@@ -88,11 +88,20 @@ agent-builder에 Edit 부여 + "기존 파일 수정은 Edit, Write는 신규 �
 ### B1. PreToolUse 훅으로 파일 소유권을 기술적으로 강제
 
 지금까지 `ORCHESTRATION.md`는 파일 소유권을 "소프트 제약"으로 포기해두었는데, 2026-10-15 조사에서
-**실제 강제 경로가 있다**는 것이 공식 문서로 확인됐다. 서브에이전트 프런트매터의 `hooks:` 필드에
-`PreToolUse` 훅을 `matcher: "Edit|Write"`로 걸고, 훅 스크립트가 stdin으로 받은 JSON의
-`tool_input.file_path`가 그 에이전트의 소유 파일인지 검사해 **exit code 2로 차단**한다. 훅은
-**그 서브에이전트에만** 적용되므로, 에이전트별로 다른 소유 경로를 줄 수 있다. 공식 문서의
-`db-reader` 예시가 같은 메커니즘으로 Bash SQL 쓰기를 막는다.
+**Claude의 도구 경로에 한해 실제 강제 경로가 있다**는 것이 공식 문서로 확인됐다. 서브에이전트
+프런트매터의 `hooks:` 필드에 `PreToolUse` 훅을 `matcher: "Edit|Write"`로 걸고, 훅 스크립트가
+stdin으로 받은 JSON의 `tool_input.file_path`가 그 에이전트의 소유 파일인지 검사해 **exit code
+2로 차단**한다. 훅은 **그 서브에이전트에만** 적용되므로, 에이전트별로 다른 소유 경로를 줄 수 있다.
+공식 문서의 `db-reader` 예시가 같은 메커니즘으로 Bash SQL 쓰기를 막는다 — 단 그 예시는
+`matcher: "Bash"` + `.tool_input.command`이고, **`Edit|Write` + `file_path` 조합은 공식 예시가
+없는 유추**이므로 도입 전에 1회 실측한다(2026-10-16 한정 추가).
+
+**이것은 "유일한 완전 강제"가 아니다**(2026-10-16 정정). 훅은 **Claude의 도구 호출만** 막는다.
+하위 프로세스(Python·Node 스크립트)가 파일을 직접 여는 경로는 훅으로 막히지 않으며, 공식 문서가
+그 용도로 지목하는 것은 **sandbox**다("For OS-level enforcement that blocks all processes from
+accessing a path, enable the sandbox"). 따라서 선택지는 ① `permissions.deny`(도구 + Claude Code가
+인식하는 Bash 파일 명령까지) ② 이 훅(에이전트별 경로 제한) ③ sandbox(OS 수준)의 **세 단계**이며,
+B1은 그중 중간이다. sandbox는 이 하네스에서 아직 써 본 적이 없다.
 
 - **이득**: 파일 소유권 원칙이 처음으로 프롬프트 의존에서 벗어난다. PJT4에서 실제로 났던 경합
   사고(`taskStore.js` 동시 write)와 같은 부류를 사전 차단할 수 있다.

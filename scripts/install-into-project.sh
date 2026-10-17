@@ -111,4 +111,6 @@ if [ -e "$TARGET/.claude/settings.json" ] && [ "$SKIPPED" -gt 0 ]; then
   fi
 fi
 echo
+echo "주의: 이 폴더의 workspace trust를 수락해야 permissions.allow(체크포인트 커밋 자동 실행), env 값, 서브에이전트 프런트매터 훅이 적용됩니다. 수락 전에는 체크포인트도 승인 프롬프트가 뜨고 훅은 조용히 건너뛰어집니다 (deny/ask는 즉시 적용)."
+echo
 echo "다음 단계(PM): 프로젝트 루트에 이 프로젝트 전용 RUN_LOG.md, SPEC.md(필요시 PRD.md/TECH_SPEC.md)를 만든다. 하네스 문서는 프로젝트 내용을 담지 않는다."
