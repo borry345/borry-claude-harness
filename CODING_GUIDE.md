@@ -16,8 +16,14 @@
 
 ## 2. 네이밍 규칙
 
+**언어 생태계의 관례를 따른다** — 하네스 내부의 일관성보다, 그 언어를 읽는 사람의 기대가 우선이다.
+공통 원칙: 이름은 축약보다 명확함을 우선한다 (`tsk`보다 `task`).
+
+### 2.1 JavaScript / TypeScript
+
 - 변수/함수: camelCase (예: `taskList`, `addTask`)
 - 상수: UPPER_SNAKE_CASE (예: `MAX_TITLE_LENGTH`)
+- 클래스: PascalCase
 - 파일명: camelCase (예: `taskStore.js`, `userProfile.js`)
 - **예외 — 프레임워크 컴포넌트 파일은 그 생태계의 관례를 따른다 (2026-10-15 신설)**: Vue 싱글 파일
   컴포넌트(`.vue`)는 PascalCase로 쓴다 (예: `ChartPanel.vue`, `LogFilterBar.vue`). React의 `.jsx`/`.tsx`
@@ -26,7 +32,23 @@
   읽기 어려워진다. **`.vue`/`.jsx`/`.tsx`가 아닌 파일(`.js`, `.ts`, `.css` 등)은 예외 없이 camelCase를
   유지한다** — 컴포저블(`useLogFilter.js`), 서비스(`authService.js`), 스토어(`logStore.js`)가 모두 여기
   해당한다. (계기: PJT5의 전면 Vue 마이그레이션에서 이 충돌이 미확정 사항으로 올라옴.)
-- 이름은 축약보다 명확함을 우선한다 (`tsk`보다 `task`)
+
+### 2.2 C# / Unity (2026-10-10 신설)
+
+- 클래스·구조체·열거형·메서드·프로퍼티·이벤트: PascalCase (예: `PlayerController`, `TakeDamage`)
+- 인터페이스: `I` 접두사 + PascalCase (예: `ITargetProvider`)
+- 지역 변수·매개변수: camelCase (예: `currentTarget`)
+- private 필드: `_` 접두사 + camelCase (예: `_currentHealth`)
+- `const`·`static readonly`: PascalCase (예: `MaxTitleLength`) — **C#은 UPPER_SNAKE_CASE를 쓰지 않는다**
+- 비동기 메서드: `Async` 접미사 (예: `LoadDataAsync`)
+- 파일명: PascalCase로, **그 파일의 주 클래스명과 정확히 일치**시킨다 (예: `PlayerController.cs`).
+  Unity는 MonoBehaviour의 파일명과 클래스명이 다르면 그 스크립트를 컴포넌트로 붙일 수 없다 —
+  이건 스타일 관례가 아니라 **엔진 제약**이다.
+
+**왜 언어별로 나눴나**: 원래 이 절은 JS를 전제한 단일 규칙("파일명 camelCase")이었다. 2026-10-10
+Unity/C# 프로젝트에 착수하면서, 그 규칙이 C# 생태계 관례와 정면으로 어긋나고 위의 Unity 엔진
+제약과도 부딪히는 것이 드러나 언어별로 분리했다. 새 언어로 작업할 일이 생기면 같은 방식으로
+절을 추가한다 — 기존 절의 규칙을 그 언어에 억지로 적용하지 않는다.
 
 ## 3. 주석/문서화 규칙
 
