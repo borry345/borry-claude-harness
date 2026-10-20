@@ -138,3 +138,22 @@ tester는 `Read, Edit, Write, Bash, Glob, Grep`이 아니라 `Read, Write, Bash,
 상황이 실제로 있었다(그때는 team-lead가 대신 처리). 같은 Write-전체덮어쓰기 위험이 테스트 파일에도
 있으므로 Edit 부여를 검토한다. 다만 tester가 소스를 고치지 못하게 막는 것은 별개 문제이고(현재도
 소프트 제약), B1의 훅과 함께 다루는 것이 자연스럽다.
+
+### B4. `plan-review`를 `context: fork` + `agent: <읽기 전용 커스텀>` + `background: false` 스킬로 (2026-10-20 추가, 미실측)
+
+2026-10-20 릴리스 교차검증(r1 §2-E)에서 나온 설계안이다. 공식 skills 문서에는 `context: fork`가
+있다 — "Claude Code starts a new subagent of the type set in the `agent` field and gives it the skill
+content as its prompt. The subagent doesn't see your conversation history" / `background: false`는
+"wait for the forked subagent's result in the turn that invoked the skill". 그리고 sub-agents 문서는
+"For a skill with `context: fork`, Claude Code follows the rules in Run skills in a subagent instead,
+**whether or not fork mode is on**"이라고 적는다.
+
+기대 효과 셋 — **전부 미실측**:
+1. "맥락 없는 독립 검토자"가 프롬프트 약속이 아니라 **공식 메커니즘으로 보장**된다.
+2. `agent:`에 `tools: Read, Grep, Glob`만 둔 커스텀 정의를 지정하면 검토자가 **진짜 읽기 전용**이
+   된다(지금은 `general-purpose`라 전체 도구).
+3. **fork mode가 켜진 세션에서도 포그라운드 대기**가 된다 — 이 하네스가 두 번 데인 자리다.
+
+도입 전 1회 실측할 것: ① 대화 이력 격리가 실제로 되는지 ② 커스텀 `agent:`의 `tools:`가 적용되는지
+(네이티브 노출 여부와 얽혀 있을 수 있다) ③ `background: false`로 같은 턴에 결과가 돌아오는지.
+**등재만 하고 도입은 하지 않는다**(이 하네스의 관례 — 문서에 적는 것과 도입은 분리).
