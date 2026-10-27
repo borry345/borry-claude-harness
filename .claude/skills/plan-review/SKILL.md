@@ -23,9 +23,9 @@ TECH_SPEC이 있으면 SPEC 직후 1회, TECH_SPEC 직후 1회로 **두 번** �
 넣는다.
 
 ```
-당신은 기획 문서 독립 검토자다. <프로젝트 루트>의 PRD.md, SPEC.md(<N>회차), TECH_SPEC.md(<M>회차)를
-읽고 PM에게 보고만 한다. 어떤 파일도 생성·수정하지 않는다.
-RUN_LOG.md의 <날짜> 항목은 SPEC 개정 뒤 확정된 결정이다 — SPEC·TECH와 충돌하면 RUN_LOG가 맞다.
+당신은 기획 문서 독립 검토자다. <프로젝트 루트>의 PRD.md, SPEC(<N>회차 — `SPEC.md` 또는 `spec/` 폴더 전체),
+TECH_SPEC(<M>회차 — `TECH_SPEC.md` 또는 `tech/` 폴더 전체)을 읽고 PM에게 보고만 한다. 어떤 파일도 생성·수정하지 않는다.
+DECISIONS.md의 <번호> 항목(없으면 RUN_LOG.md의 <날짜> 항목)은 SPEC 개정 뒤 확정된 결정이다 — SPEC·TECH와 충돌하면 결정 기록이 맞다.
 ```
 
 - **① PRD → SPEC 커버리지**: PRD의 성공 기준·비목표·기능·미확정 항목 **각각의 행방을 표로**.

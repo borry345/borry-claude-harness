@@ -13,13 +13,13 @@
 
 | 카테고리 | 원본 위치 | 비고 |
 |---|---|---|
-| 기억과 연속성 | `HANDOFF.md`(부트스트랩 전용) + `RUN_LOG.md`(결정·이유·실패 이력의 유일한 소유자) | 세션 시작 시 HANDOFF.md로 진입, 최근 결정/실패 이력은 RUN_LOG.md 최신 항목부터 읽는다 |
+| 기억과 연속성 | `HANDOFF.md`(부트스트랩 전용) + `DECISIONS.md`(결정의 현재 상태·이유, 주제별·갱신형) + `RUN_LOG.md`(실행 일지: 디스패치·비용·실패·사고, append-only) | 세션 시작 시 HANDOFF.md로 진입, 결정은 DECISIONS.md 색인에서, 최근 이력은 RUN_LOG.md 최신 항목부터 읽는다(전체를 읽지 않는다). 2026-10-27 분리 |
 | 변경 통제 | `.claude/settings.json`(permissions.ask) + `ORCHESTRATION.md` "체크포인트/의미있는 커밋 이원화" | `git commit/tag/push/reset`, `npm install` 등은 프롬프트가 아니라 실제 승인 게이트로 강제됨 |
 | 고위험 행동 차단 | `.claude/settings.json`(permissions.ask/allow) | 도구 권한 레벨의 기술적 강제 — 소프트 제약이 아님 |
 | 개발 작업 안전 | `ORCHESTRATION.md` "구현 에이전트 디스패치 원칙" | 파일 소유권, 스크래치 디렉터리 격리, 3-strikes 재시도 상한 |
 | 반복 절차 | `.claude/skills/*/SKILL.md` | **필수 읽기 아님** — 필요할 때 로드된다. 디스패치 골격(`dispatch-implementer`), 개행 바이트 감사(`eol-audit`), RUN_LOG 안전 append(`runlog-append`), 기준선 전달(`baseline-handoff`), 푸시 전 점검(`pre-push-check`), 기획 문서 교차 점검(`plan-review`). 절차를 `ORCHESTRATION.md`에 더 쌓지 말고 여기에 둔다 — 그 파일은 매 세션 전량 로드된다 |
 | 코드 스타일/아키텍처 | `CODING_GUIDE.md` | 최소 수정 원칙, 네이밍, 에러 처리, 로깅, 시크릿 관리 |
-| 사용자와 프로젝트 맥락 | *(하네스 레벨엔 의도적으로 없음)* — 각 프로젝트 루트의 `PRD.md`(있는 경우)/`SPEC.md`/`TECH_SPEC.md` | 하네스는 특정 프로젝트에 종속되지 않는다는 원칙(`HANDOFF.md`) 때문에 여기 두지 않음 |
+| 사용자와 프로젝트 맥락 | *(하네스 레벨엔 의도적으로 없음)* — 각 프로젝트 루트의 `PRD.md`(있는 경우)/`SPEC.md` 또는 `spec/`/`TECH_SPEC.md` 또는 `tech/`(큰 프로젝트는 분할 — `ORCHESTRATION.md` "기획 문서 분할") | 하네스는 특정 프로젝트에 종속되지 않는다는 원칙(`HANDOFF.md`) 때문에 여기 두지 않음 |
 | 대화 방식 | *(아직 정의 안 됨)* | 필요해지면 원본 문서를 정하고 이 표에 행을 추가 |
 | 차기 설계 논의 | `DESIGN_NOTES.md` | **필수 읽기 아님** — 확정된 정책이 아니라 "다음 버전이라면" 가정의 백로그. 필요할 때만 열어본다 |
 | 검토 이력 | `reviews/<날짜>-<버전>-r<N>-<역할>.md` | **필수 읽기 아님** — 릴리스 교차검증(공식 문서 기준으로 다른 PM 세션이 하네스 변경을 검증한 왕복)의 근거 기록. 한 시점 스냅샷이라 덮어쓰지 않고 파일을 쌓는다. 확정 결과는 `CHANGELOG.md`·`RUN_LOG.md`가 소유하고, 상한은 `ORCHESTRATION.md` "루프/폭주 방지 정책"의 4문서 규칙 |

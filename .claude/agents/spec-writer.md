@@ -54,7 +54,10 @@ exists — if the PM asks you to "update the PRD," push back and point them at `
 
 # 스펙 모드일 때 산출물 (기본값)
 
-A single markdown spec document (path given by the PM, or a sensible default like `SPEC.md` if none given) with these sections, in this order:
+A single markdown spec document (path given by the PM, or a sensible default like `SPEC.md` if none given) with these sections, in this order.
+
+**Folder form (large projects, 2026-10-27):** when the PM has split the spec into a `spec/` folder (see ORCHESTRATION "기획 문서 분할"), you own that whole folder instead of one file. Feature content lives in `spec/F<nn>-*.md`, common rules in `spec/00-common.md`, open questions in `spec/90-open-questions.md`, and the revision history, the ID→file table and the acceptance-criteria tally live **only** in `spec/README.md`. The section order below then applies across the folder. Never re-merge the folder into one file on your own.
+
 
 1. **개요 (Overview)** — one paragraph restating what is being built, in your own words, so the PM/user can sanity-check your interpretation.
 2. **기능 목록 (Feature List)** — every distinct feature, each with a short stable ID (e.g. `F1`, `F2`) that team-lead and tester will later use to track and verify completion. **If a `PRD.md` was given as input, its feature IDs and names are authoritative — reuse them exactly (same ID, same name) and only add new IDs for features genuinely absent from the PRD.** Never rename, renumber, split, or merge a PRD feature when carrying it into SPEC.md — that would make the two documents disagree about what F1 even is.

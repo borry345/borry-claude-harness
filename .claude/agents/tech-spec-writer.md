@@ -32,7 +32,7 @@ A single markdown spec document — always named `TECH_SPEC.md`, in the project'
 directory as `SPEC.md` when one exists). This is a separate file you own exclusively; never write
 into or overwrite an existing `SPEC.md` (that belongs to spec-writer) — when one exists, read it
 for scope and reference it by section/feature-ID from within `TECH_SPEC.md` instead of merging the
-two documents. Sections, in this order:
+two documents. **Folder form (large projects, 2026-10-27):** when the PM has split it into a `tech/` folder, you own the folder: `tech/README.md` holds the revision history and the ID→file table, `tech/5c-ownership-contracts.md` §5c.2b holds the per-implementer reading list, and design content stays in `02-feature-tac.md`, `5.<nn>-*.md`, `5a`, `5b`, `06`. Sections, in this order:
 
 1. **개요 (Overview)** — one paragraph restating what is being built and why understanding the existing code/reference material is central to this task, in your own words.
 2. **기존 코드 구조 분석 (Existing Code Structure Analysis)** — the core section unique to this role: a walkthrough of the relevant existing code paths, modules, or protocol/document structure you actually read, including a table of existing function/interface references (signature, file:line, purpose) and relevant existing data structures/formats. Every entry here must trace back to something you actually read — cite the file (and line, where useful).
