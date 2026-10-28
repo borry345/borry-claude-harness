@@ -8,7 +8,7 @@ description: RUN_LOG.md(실행 일지)에 디스패치·비용·실패 이력과
 `RUN_LOG.md`는 **실행 일지**(디스패치·비용·실패·사고·절차 위반)다. 결정의 현재 상태와 이유는
 `DECISIONS.md`가 소유한다(2026-10-27 분리). 결정이 나면 RUN_LOG에는 **한 줄**(번호·요지·"PM 추천 →
 사용자 변경" 여부)만 남기고, 결정·이유·버린 대안·반영 위치·변경 이력은 `DECISIONS.md`의 해당 항목에
-`Edit`로 쓴다 — 항목을 지우지 않고 상태 변경은 날짜와 함께 덧붙인다. 두 파일 모두 PM만 쓴다 —
+`Edit`로 쓴다 — 항목을 지우지 않고 상태 변경은 날짜와 함께 덧붙인다. 두 파일 모두 PM만 쓴다(기존 RUN_LOG에서 DECISIONS로의 **최초 이관**만 doc-writer에 맡길 수 있다) —
 모든 서브에이전트 디스패치에 "RUN_LOG를 손대지 마세요"를 넣는다(길어서 읽히면 비용만 든다).
 
 ## 방법
@@ -28,7 +28,7 @@ entry = (
 with open("RUN_LOG.md", "r", encoding="utf-8", newline="") as f:
     cur = f.read()
 crlf = cur.count("\r\n")
-eol = "\r\n" if crlf >= cur.count("\n") - crlf else "\n"  # 파일의 기존 개행을 따른다 (프로젝트 RUN_LOG는 LF인 경우가 있다)
+eol = "\r\n" if crlf >= cur.count("\n") - crlf else "\n"  # 파일의 기존 개행을 따른다 (프로젝트 RUN_LOG는 LF인 경우가 있다). 빈 파일(0 대 0)은 CRLF — 프로젝트가 LF 관례면 첫 항목 전에 eol을 직접 지정한다
 if not cur.endswith("\n"):
     cur += eol
 with open("RUN_LOG.md", "w", encoding="utf-8", newline="") as f:

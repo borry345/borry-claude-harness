@@ -22,11 +22,19 @@
 
 ### 추가됨 (2026-10-27, 뱀서라이크 운행 중 — 미시험)
 
-- **결정 기록 분리 `DECISIONS.md`**: 프로젝트 `RUN_LOG.md`는 실행 일지(디스패치·비용·실패·사고)만, 결정의 현재 상태·이유·버린 대안·반영 위치·변경 이력은 주제별 `DECISIONS.md`로. 결정 확정 → 같은 턴에 DECISIONS 갱신 + RUN_LOG 한 줄 + 소유 문서 개정. 반영: `ORCHESTRATION.md` 문서 표·배치 규칙·PM 행동 규칙·세션 분리 점검, `HANDOFF.md`, `CLAUDE.md`, `runlog-append`, `plan-review`(결정 출처). 근거: 결정 46건이 날짜순 로그에 흩어져 재수정 추적 불가, 115KB 로그 세션당 35~40K 토큰(뱀서라이크 D2).
-- **기획 문서 분할(선택)**: 기능 10개 이상 또는 수용 기준 100개 이상이면 `SPEC.md` → `spec/`, `TECH_SPEC.md` → `tech/`로 제목 단위 바이트 보존 분할. 소유 에이전트는 README 색인과 TECH 5c.2b "구현자별 읽을 파일"만 채운다. 반영: `ORCHESTRATION.md` "기획 문서 분할", 문서 표, `spec-writer`·`tech-spec-writer`·`tester` 정의(폴더 형태), `CODING_GUIDE.md`, `CLAUDE.md`. 근거: 구현자가 12행을 보려고 2,028행을 읽던 구조, 참조가 ID라 분할해도 유효(뱀서라이크 D1).
+- **결정 기록 분리 `DECISIONS.md`**: 프로젝트 `RUN_LOG.md`는 실행 일지(디스패치·비용·실패·사고)만, 결정의 현재 상태·이유·버린 대안·반영 위치·변경 이력은 주제별 `DECISIONS.md`로. 결정 확정 → 같은 턴에 DECISIONS 갱신 + RUN_LOG 한 줄 + 소유 문서 개정. 반영: `ORCHESTRATION.md` 문서 표·배치 규칙·PM 행동 규칙·세션 분리 점검, `HANDOFF.md`, `CLAUDE.md`, `runlog-append`, `plan-review`(결정 출처). 근거: 결정 46건이 날짜순 로그에 흩어져 재수정 추적 불가, 115KB 로그 세션당 35~40K 토큰(뱀서라이크 `DECISIONS.md` 절차-D2).
+- **기획 문서 분할(선택)**: 기능 10개 이상 또는 수용 기준 100개 이상이면 `SPEC.md` → `spec/`, `TECH_SPEC.md` → `tech/`로 제목 단위 바이트 보존 분할. 소유 에이전트는 README 색인과 TECH 5c "구현자별 읽을 파일" 표만 채운다. 반영: `ORCHESTRATION.md` "기획 문서 분할", 문서 표, `spec-writer`·`tech-spec-writer`·`tester` 정의(폴더 형태), `CODING_GUIDE.md`, `CLAUDE.md`. 근거: 구현자가 자기 절(최소 12행)을 보려고 2,028행을 읽던 구조, 분할 뒤 필수 읽기량 23~48%, 참조가 ID라 분할해도 유효(뱀서라이크 `DECISIONS.md` 절차-D1).
 - **`dispatch-implementer` 8번 블록 "읽기 범위"**: 디스패치 프롬프트에 읽을 파일 목록(공통/필수/계약만)을 넣고 목록 밖 문서를 열었으면 보고하게 한다. RUN_LOG는 주지 않는다.
 - **`runlog-append` 개행 자동 감지**: 스크립트가 CRLF를 강제해 LF인 프로젝트 RUN_LOG에 섞일 수 있던 것을 파일의 기존 개행을 따르도록 수정.
 - `DESIGN_NOTES.md` 1번·4번 항목에 부분 반영 메모.
+
+### 변경됨 (2026-10-28, 10-27 추가분의 릴리스 교차검증 r1 반영 — `reviews/2026-10-28-*`)
+
+- **이식성**: "TECH 5c.2b"(뱀서라이크의 절 번호)를 "TECH 5c의 구현자별 읽을 파일 표"로 바꾸고, 그 표를 **만드는 쪽**인 `tech-spec-writer` 정의 5c 항목에 추가(r1 G1). 하네스 문서의 "뱀서라이크 D1/D2" 7곳을 그 프로젝트 `DECISIONS.md`의 실제 표기 "절차-D1/D2"로(G2).
+- **실행 수단**: ORCHESTRATION "새 세션 시작"에 RUN_LOG를 끝에서부터 읽는 방법(Grep으로 마지막 항목 행 → Read offset)(E). `dispatch-implementer` 8번 블록에 "프롬프트 지시이며 범위 준수는 서브에이전트 transcript의 `Read` file_path로 확인" 1항목(B).
+- **자기 규칙**: ORCHESTRATION "기획 문서 분할"에서 분할 절차 구절을 첫 적용 기록 포인터로, 표준 배치 파일명은 spec-writer·tech-spec-writer 정의 소유로(D). "12행" 수치에 근거(가장 짧은 5.x 절)와 23~48%를 병기(G5).
+- **자기 정합**: HANDOFF "지금 상태"에 세 번째 묶음(G3). `DECISIONS.md` "PM 전용"에 최초 이관은 doc-writer 가능 예외(G4, 문서 표·`runlog-append`). `runlog-append` 빈 파일 경계 주석(G6).
+- 다음 릴리스로 넘긴 것: settings `PreToolUse` 훅의 `agent_type` 분기로 서브에이전트별 경로 강제(미실측) / `tester`가 두 폴더 세션 모두에서 네이티브 타입으로 노출되지 않는 원인 / hooks 문서의 `${tool_input.file_path}` 치환 근거로 `file_path` 차단 재검증 / 검토자 세션의 개설·프롬프트·도구 권한 주체 규칙(r4 C1 — 사용자가 2026-10-28 "PM 헤드리스 개설 허용"으로 결정, 조건은 `HANDOFF.md`) / 검토자에게 두 번째 검증 수단(curl류) 보장 / WebFetch 요약기 자기 보고 길이는 측정값 아님.
 
 두 PM 세션이 공식 Claude Code 문서로 `v0.2.2`를 교차검증한 결과를 반영한다(문서 7개: 검토 → 응답 → 합의안 → 4라운드 → 개정안 → 서명안 → 인계서. 적용 단위 A0~A10 + N1~N6, 양쪽 전건 수용). **시험 전이므로 태그를 붙이지 않는다.**
 
